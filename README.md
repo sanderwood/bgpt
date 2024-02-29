@@ -17,6 +17,8 @@ We provide five weights of bGPT on [Hugging Face](https://huggingface.co/sander-
 4. **_weights-image.pth_**: bGPT pre-trained on ImageNet for image generation/classification (`.bmp`).
 5. **_weights-audio.pth_**: bGPT pre-trained on Librispeech for audio generation/classification (`.wav`).
 
+The core components of bGPT include a 12-layer patch-level decoder, a 3-layer byte-level decoder, with a hidden size of 768, totaling 110 million parameters.
+
 ## Installation
 
 To set up the bGPT environment and install the necessary dependencies, follow these steps:
