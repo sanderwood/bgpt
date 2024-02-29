@@ -336,6 +336,8 @@ class SimpleCPUSimulator:
         with open(states_path, 'rb') as f:
             states = f.read()
 
+        result = ""
+
         # Split the byte stream into memory and CPU states
         states = list(states)
         memory = states[:len(self.memory)]
@@ -343,6 +345,7 @@ class SimpleCPUSimulator:
 
         print("Program:", self.back_translate_program(memory))
         print()
+        result += "Program: " + str(self.back_translate_program(memory)) + "\n\n"
 
         # Split the CPU states into individual states
         for i in range(0, len(states), 6 + len(self.registers)):
@@ -359,6 +362,13 @@ class SimpleCPUSimulator:
             print("IR:", self.back_translate(IR))
             print("Registers:", registers)
             print()
+            result += "State at step %d:\n" % (i // (6 + len(self.registers)))
+            result += "PC: " + str(PC) + "\n"
+            result += "ACC: " + str(ACC) + "\n"
+            result += "IR: " + str(self.back_translate(IR)) + "\n"
+            result += "Registers: " + str(registers) + "\n\n"
+        
+        return result
 
     def random_program(self, num_instructions=10):
         # Generate a random program
@@ -425,9 +435,10 @@ def argument_parser():
     parser.add_argument("--states_path", type=str, default="cpu_states/cpu.bin", help="Path to the CPU states, only for 'translate' mode")
     parser.add_argument("--num_min_program", type=int, default=1, help="Minimum number of instructions in the program, only for 'generate' mode")
     parser.add_argument("--num_max_program", type=int, default=255, help="Maximum number of instructions in the program, only for 'generate' mode")
-    parser.add_argument("--num_train_instance", type=int, default=210, help="Number of training instances, only for 'generate' mode")
-    parser.add_argument("--num_test_instance", type=int, default=21, help="Number of testing instances, only for 'generate' mode")
+    parser.add_argument("--num_train_instance", type=int, default=2100000, help="Number of training instances, only for 'generate' mode")
+    parser.add_argument("--num_test_instance", type=int, default=21000, help="Number of testing instances, only for 'generate' mode")
     parser.add_argument("--random_seed", type=int, default=0, help="Random seed")
+    parser.add_argument("--output_path", type=str, default="cpu_states.txt", help="Path to save the translated CPU states, only for 'translate' mode")
 
     return parser.parse_args()
 
@@ -443,6 +454,7 @@ if __name__ == "__main__":
     num_train_instance = args.num_train_instance
     num_test_instance = args.num_test_instance
     random_seed = args.random_seed
+    output_path = args.output_path
 
     if mode == "generate":
         random.seed(random_seed)
@@ -479,7 +491,9 @@ if __name__ == "__main__":
         print("Translating the CPU states at %s" % states_path)
         cpu = SimpleCPUSimulator(num_registers=num_registers,
                                  memory_size=memory_size)
-        cpu.translate_states(states_path)
+        result = cpu.translate_states(states_path)
+        with open(output_path, 'w') as f:
+            f.write(result)
 
     elif mode == "evaluate":
         matched_bytes = 0
