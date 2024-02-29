@@ -9,11 +9,11 @@ Traditional deep learning often overlooks bytes, the basic units of the digital 
 
 We provide five weights of bGPT on [Hugging Face](https://huggingface.co/sander-wood/bgpt/tree/main) corresponding to each dataset used for pre-training:
 
-1. **_weights-conversion.pth_**: bGPT pre-trained on IrishMAN for data conversion.
-2. **_weights-cpu.pth_**: bGPT pre-trained on CPU states for CPU state modelling.
-3. **_weights-text.pth_**: bGPT pre-trained on Wikipedia for text generation/classification.
-4. **_weights-image.pth_**: bGPT pre-trained on ImageNet for image generation/classification.
-5. **_weights-audio.pth_**: bGPT pre-trained on Librispeech for audio generation/classification.
+1. **_weights-conversion.pth_**: bGPT pre-trained on IrishMAN for data conversion (between `.abc` and `.mid`).
+2. **_weights-cpu.pth_**: bGPT pre-trained on CPU states for CPU state modelling (`.bin`).
+3. **_weights-text.pth_**: bGPT pre-trained on Wikipedia for text generation/classification (`.txt`).
+4. **_weights-image.pth_**: bGPT pre-trained on ImageNet for image generation/classification (`.bmp`).
+5. **_weights-audio.pth_**: bGPT pre-trained on Librispeech for audio generation/classification (`.wav`).
 
 ## Installation
 
