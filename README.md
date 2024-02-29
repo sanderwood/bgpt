@@ -7,7 +7,7 @@ You can check out the [demo page](https://byte-gpt.github.io/), which includes e
 ## Model Description
 Traditional deep learning often overlooks bytes, the basic units of the digital world, where all forms of information and operations are encoded and manipulated in binary format. Inspired by the success of next token prediction in natural language processing, we introduce bGPT, a model with next byte prediction to simulate the digital world. bGPT matches specialized models in performance across various modalities, including text, audio, and images, and offers new possibilities for predicting, simulating, and diagnosing algorithm or hardware behaviour. It has almost flawlessly replicated the process of converting symbolic music data, achieving a low error rate of 0.0011 bits per byte in converting ABC notation to MIDI format. In addition, bGPT demonstrates exceptional capabilities in simulating CPU behaviour, with an accuracy exceeding 99.99% in executing various operations. Leveraging next byte prediction, models like bGPT can directly learn from vast binary data, effectively simulating the intricate patterns of the digital world.
 
-We provide five weights of bGPT on [Hugging Face](https://huggingface.co/sander-wood/bgpt) corresponding to each dataset used for pre-training:
+We provide five weights of bGPT on [Hugging Face](https://huggingface.co/sander-wood/bgpt/tree/main) corresponding to each dataset used for pre-training:
 
 1. **_weights-conversion.pth_**: bGPT pre-trained on IrishMAN for data conversion.
 2. **_weights-cpu.pth_**: bGPT pre-trained on CPU states for CPU state modelling.
@@ -39,7 +39,7 @@ To set up the bGPT environment and install the necessary dependencies, follow th
    ```
 4. Download Pre-trained bGPT Weights (Optional)
    
-   For those interested in starting with pre-trained models, bGPT weights are available on [Hugging Face](https://huggingface.co/sander-wood/bgpt). This step is optional but recommended for users looking to leverage the model's capabilities without training from scratch.
+   For those interested in starting with pre-trained models, bGPT weights are available on [Hugging Face](https://huggingface.co/sander-wood/bgpt/tree/main). This step is optional but recommended for users looking to leverage the model's capabilities without training from scratch.
    
 ## Usage
 
