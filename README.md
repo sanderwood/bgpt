@@ -1,6 +1,6 @@
 # Beyond Language Models: Byte Models are Digital World Simulators
 
-This repository contains the code for the bGPT model as described in the paper [Beyond Language Models: Byte Models are Digital World Simulators](https://arxiv.org/pdf/%3CARXIV%20PAPER%20ID%3E.pdf).
+This repository contains the code for the bGPT model as described in the paper [Beyond Language Models: Byte Models are Digital World Simulators](https://arxiv.org/pdf/2402.19155.pdf).
 
 bGPT supports generative modelling via next byte prediction on any type of data and can perform any task executable on a computer, showcasing the capability to simulate all activities within the digital world, with its potential only limited by computational resources and our imagination.
 
