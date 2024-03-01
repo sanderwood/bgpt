@@ -77,7 +77,7 @@ The `config.py` file contains critical settings for training and inference, allo
 
 Generative modelling with bGPT is a flexible and powerful approach to learning and generating new data across various formats. bGPT segments byte sequences into patches, predicts next patch features with a patch-level decoder, and reconstructs bytes within patches using these features with a byte-level decoder. Here's how to get started:
 
-1. **Prepare Your Data**: Since bGPT models information at the byte level, it can work with any type of file that exists on a computer, regardless of format. This means your training and evaluation datasets can include text, images, audio, or any other file type.
+1. **Prepare Your Data**: bGPT can handle any computer file type, including text, images, audio, executables, and encrypted or proprietary formats, without needing specific adjustments for each modality. This capability allows for straightforward and versatile training on a wide array of data. The only thing you need to do here is simply to split your data for training and evaluation.
 
 2. **Adjust Configuration Settings**: Modify the `config.py` file to tailor the training process to your needs. At a minimum, you should update the `TRAIN_FOLDERS` and `EVAL_FOLDERS` to point to your actual data directories. Also, specify where to save the trained model weights and logs by setting `WEIGHTS_PATH` and `LOGS_PATH`. You may adjust other parameters based on your specific requirements. For instance, with the default `PATCH_SIZE=16` and `PATCH_LENGTH=512`, bGPT can model byte sequences up to 8KB. If your training files are larger, and you have sufficient computational resources, consider increasing these parameters to accommodate the larger file sizes.
 
