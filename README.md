@@ -137,7 +137,7 @@ The generation of the CPU States Dataset is facilitated by the `cpu-simulation.p
 
 The CPU States Dataset contains 2.1 million instances, each featuring a 1KB memory block and sequences of 16-byte CPU register states that include a variety of instruction types, such as data movement, logical, and arithmetic operations. This dataset simulates typical CPU behaviour, providing a rich resource for research and development in digital system simulation.
 
-## BibTeX entry and citation info
+## BibTeX
 ```
 @misc{wu2024language,
       title={Beyond Language Models: Byte Models are Digital World Simulators}, 
