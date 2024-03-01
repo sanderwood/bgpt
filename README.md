@@ -36,12 +36,12 @@ To set up the bGPT environment and install the necessary dependencies, follow th
    pip install -r requirements.txt
    ```
 
-3. **Download Pre-trained bGPT Weights (Optional)**
+3. **Install Pytorch**
 
    ```bash
    pip install torch==1.13.1+cu116 torchvision==0.14.1+cu116 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu116
    ```
-4. Download Pre-trained bGPT Weights (Optional)
+4. **Download Pre-trained bGPT Weights (Optional)**
    
    For those interested in starting with pre-trained models, bGPT weights are available on [Hugging Face](https://huggingface.co/sander-wood/bgpt/tree/main). This step is optional but recommended for users looking to leverage the model's capabilities without training from scratch.
    
