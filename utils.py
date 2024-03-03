@@ -6,7 +6,7 @@ from samplings import top_p_sampling, top_k_sampling, temperature_sampling
 
 class PatchLevelDecoder(PreTrainedModel):
     """
-    An Patch-level Decoder model for generating patch features in an auto-regressive manner. 
+    A Patch-level Decoder model for generating patch features in an auto-regressive manner. 
     It inherits PreTrainedModel from transformers.
     """
     def __init__(self, config):
