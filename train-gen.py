@@ -107,22 +107,69 @@ def read_bytes(filename):
 
     bos_patch = ext + [256] * (PATCH_SIZE - len(ext))
     bytes = bos_patch + bytes + [256] * PATCH_SIZE
-    bytes = bytes[:PATCH_LENGTH*PATCH_SIZE]
+
+    if len(bytes) > PATCH_LENGTH*PATCH_SIZE:
+        print(f"Warning: {filename} is too long, truncating to {PATCH_LENGTH*PATCH_SIZE} bytes.")
+        bytes = bytes[:PATCH_LENGTH*PATCH_SIZE]
+
     masks = [1] * (len(bytes)//PATCH_SIZE)
 
     return bytes, masks
 
 class ByteDataset(Dataset):
     def __init__(self, filenames):
-        self.filenames = filenames
+        if CONVERSION_MODE == None:
+            print(f"Regular Training Mode: {CONVERSION_MODE}, lodading {len(filenames)} files")
+            self.filenames = filenames
+        elif "->" in CONVERSION_MODE:
+            print(f"Unidirectional Conversion Mode: {CONVERSION_MODE}, loading {len(filenames)} files")
+            input_ext = CONVERSION_MODE.split("->")[0]
+            target_ext = CONVERSION_MODE.split("->")[1]
+
+            self.filenames = []
+            for filename in filenames:
+                if filename.split('.')[-1]==input_ext:
+                    target_filename = filename[:-(len(input_ext))] + target_ext
+                    if os.path.exists(target_filename):
+                        self.filenames.append((filename, target_filename))
+        elif "&" in CONVERSION_MODE:
+            print(f"Bidirectional Conversion Mode: {CONVERSION_MODE}, loading {len(filenames)} files")
+            input_ext = CONVERSION_MODE.split("&")[0]
+            target_ext = CONVERSION_MODE.split("&")[1]
+
+            self.filenames = []
+            for filename in filenames:
+                if filename.split('.')[-1]==input_ext:
+                    target_filename = filename[:-(len(input_ext))] + target_ext
+                    if os.path.exists(target_filename):
+                        self.filenames.append((filename, target_filename))
+                elif filename.split('.')[-1]==target_ext:
+                    input_filename = filename[:-(len(target_ext))] + input_ext
+                    if os.path.exists(input_filename):
+                        self.filenames.append((input_filename, filename))
+        else:
+            raise ValueError("Invalid Conversion Mode, please check the config.py file")
             
     def __len__(self):
         return len(self.filenames)
 
     def __getitem__(self, idx):
         
-        filename = self.filenames[idx]
-        file_bytes, file_masks = read_bytes(filename)
+        if CONVERSION_MODE == None:
+            filename = self.filenames[idx]
+            file_bytes, file_masks = read_bytes(filename)
+        else:
+            input_filename, target_filename = self.filenames[idx]
+            input_bytes, input_masks = read_bytes(input_filename)
+            target_bytes, target_masks = read_bytes(target_filename)
+
+            file_bytes = input_bytes[:-PATCH_SIZE] + target_bytes
+            file_masks = input_masks[:-1] + target_masks
+
+            if len(file_bytes) > PATCH_LENGTH*PATCH_SIZE:
+                print(f"Warning: {input_filename} and {target_filename} are too long after concatenation, truncating to {PATCH_LENGTH*PATCH_SIZE} bytes.")
+                file_bytes = file_bytes[:PATCH_LENGTH*PATCH_SIZE]
+                file_masks = file_masks[:PATCH_LENGTH]
 
         file_bytes = torch.tensor(file_bytes, dtype=torch.long)
         file_masks = torch.tensor(file_masks, dtype=torch.long)

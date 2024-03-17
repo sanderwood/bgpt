@@ -79,6 +79,7 @@ def read_bytes(filename):
 
 class ByteDataset(Dataset):
     def __init__(self, filenames):
+        print(f"Loading {len(filenames)} files for classification")
         self.filenames = []
         self.labels = {}
 
