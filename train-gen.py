@@ -119,7 +119,7 @@ def read_bytes(filename):
 class ByteDataset(Dataset):
     def __init__(self, filenames):
         if CONVERSION_MODE == None:
-            print(f"Regular Training Mode: {CONVERSION_MODE}, lodading {len(filenames)} files")
+            print(f"Regular Training Mode: {CONVERSION_MODE}, loading {len(filenames)} files")
             self.filenames = filenames
         elif "->" in CONVERSION_MODE:
             print(f"Unidirectional Conversion Mode: {CONVERSION_MODE}, loading {len(filenames)} files")
@@ -266,7 +266,7 @@ if __name__ == "__main__":
     model = model.to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE)
 
-    if LOAD_FROM_PRE_CHECKPOINT and os.path.exists(PRE_WEIGHTS_PATH):
+    if LOAD_FROM_PRETRAINED and os.path.exists(PRE_WEIGHTS_PATH):
         # Load checkpoint to CPU
         checkpoint = torch.load(PRE_WEIGHTS_PATH, map_location='cpu')
 

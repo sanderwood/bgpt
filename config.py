@@ -39,7 +39,7 @@ BATCH_SIZE = 1                                                  # Batch size for
 ACCUMULATION_STEPS = 1                                          # Accumulation steps to simulate large batch size
 PATCH_SAMPLING_BATCH_SIZE = 0                                   # Batch size for patch during training, 0 for full conaudio
 LOAD_FROM_CHECKPOINT = False                                    # Whether to load weights from a checkpoint
-LOAD_FROM_PRE_CHECKPOINT = True                                 # Whether to load pre-trained weights from a checkpoint
+LOAD_FROM_PRETRAINED = True                                     # Whether to load pre-trained weights from a checkpoint
 CONVERSION_MODE = None                                          # Mode of conversion (None for regular training, input->output for unidirectional conversion, input&output for bidirectional conversion)
 
 # Configuration for inference
