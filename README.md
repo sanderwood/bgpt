@@ -61,7 +61,7 @@ The `config.py` file contains critical settings for training and inference, allo
 
 - **TRAIN_FOLDERS**: Specify the dataset folders for training. Multiple folders can be included.
 - **EVAL_FOLDERS**: Specify evaluation dataset folders.
-- **PRE_WEIGHTS_PATH**: Path to pre-trained weights for transfer learning and fine-tuning.
+- **PRETRAINED_PATH**: Path to pre-trained weights for transfer learning and fine-tuning.
 - **WEIGHTS_PATH & LOGS_PATH**: Define locations to save trained weights and logs, respectively.
 - **NUM_EPOCHS, LEARNING_RATE, BATCH_SIZE**: Control training duration, learning rate, and batch size for optimal learning.
 - **ACCUMULATION_STEPS**: Set accumulation steps to emulate larger batch sizes, managing memory usage efficiently.
@@ -81,7 +81,7 @@ Generative modelling with bGPT is a flexible and powerful approach to learning a
 
 2. **Adjust Configuration Settings**: Modify the `config.py` file to tailor the training process to your needs. At a minimum, you should update the `TRAIN_FOLDERS` and `EVAL_FOLDERS` to point to your actual data directories. Also, specify where to save the trained model weights and logs by setting `WEIGHTS_PATH` and `LOGS_PATH`. You may adjust other parameters based on your specific requirements. For instance, with the default `PATCH_SIZE=16` and `PATCH_LENGTH=512`, bGPT can model byte sequences up to 8KB. If your training files are larger, and you have sufficient computational resources, consider increasing these parameters to accommodate the larger file sizes.
 
-3. **Leverage Pre-trained Weights (Optional)**: If you wish to fine-tune a pre-trained bGPT model, set `PRE_WEIGHTS_PATH` to the location of the pre-trained weights and ensure `LOAD_FROM_PRE_CHECKPOINT=True`. To train a model from scratch, simply set `LOAD_FROM_PRE_CHECKPOINT=False`.
+3. **Leverage Pre-trained Weights (Optional)**: If you wish to fine-tune a pre-trained bGPT model, set `PRETRAINED_PATH` to the location of the pre-trained weights and ensure `LOAD_FROM_PRETRAINED=True`. To train a model from scratch, simply set `LOAD_FROM_PRETRAINED=False`.
 
 4. **Start Training**: Run `train-gen.py` to begin the training process. The script will use the configurations set in `config.py` and apply the training data to learn generative models capable of producing new, unseen outputs in the format of your training data.
 
@@ -91,7 +91,7 @@ Classification with bGPT leverages the model's ability to understand and differe
 
 1. **Prepare Labelled Data**: Ensure your dataset consists of labelled data, which can be a mix of different formats. The model distinguishes between data types using the naming convention `label.ext`, where the label is derived from the filename, specifically `filename.split('_')[0]`. This means that the label for classification should be clearly reflected in the file name, such as "Business_1.txt". It is crucial to organize your files accordingly to facilitate accurate classification.
 
-2. **Generative Modelling Before Classification (Strongly Recommended)**: Before embarking on classification tasks, it is highly recommended to perform generative modelling on the same dataset. Starting with weights trained through generative modelling provides a solid foundation for further fine-tuning in classification tasks. To do this, set `PRE_WEIGHTS_PATH` to your generative model weights and ensure `LOAD_FROM_PRE_CHECKPOINT=True`. Directly training a classification model from scratch without this pre-training step has been observed to result in significantly poorer performance. When fine-tuning for classification, ensure that `WEIGHTS_PATH` and `LOGS_PATH` are set to different locations to prevent overwriting previous models. Note that the classification model will inherit the bGPT's patch-level decoder and discard the byte-level decoder, so it's essential to keep the model parameters unchanged during this phase.
+2. **Generative Modelling Before Classification (Strongly Recommended)**: Before embarking on classification tasks, it is highly recommended to perform generative modelling on the same dataset. Starting with weights trained through generative modelling provides a solid foundation for further fine-tuning in classification tasks. To do this, set `PRETRAINED_PATH` to your generative model weights and ensure `LOAD_FROM_PRETRAINED=True`. Directly training a classification model from scratch without this pre-training step has been observed to result in significantly poorer performance. When fine-tuning for classification, ensure that `WEIGHTS_PATH` and `LOGS_PATH` are set to different locations to prevent overwriting previous models. Note that the classification model will inherit the bGPT's patch-level decoder and discard the byte-level decoder, so it's essential to keep the model parameters unchanged during this phase.
 
 3. **Start Training for Classification**: Run `train-cls.py` to begin the classification training process. The script will utilize the previously set configurations and apply them to your labelled dataset. The model will learn to classify the input data into the defined categories based on the labels extracted from the filenames.
 
