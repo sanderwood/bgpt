@@ -85,6 +85,26 @@ Generative modelling with bGPT is a flexible and powerful approach to learning a
 
 4. **Start Training**: Run `train-gen.py` to begin the training process. The script will use the configurations set in `config.py` and apply the training data to learn generative models capable of producing new, unseen outputs in the format of your training data.
 
+### Data Conversion
+
+The conversion mode in bGPT adds a specialized functionality for transforming data from one format to another, leveraging the model's understanding of byte sequences across different file types. This mode supports both unidirectional and bidirectional conversions, enabling a wide range of data transformation tasks. Here's how to utilize the conversion mode effectively:
+
+1. **Define Conversion Mode**: In your `config.py` file, you'll define the `CONVERSION_MODE` setting, which governs how files are transformed. This setting offers two options: unidirectional and bidirectional conversion, denoted by `"->"` and `"&"` respectively.
+
+   - Unidirectional Conversion: Denoted by `"->"`, this mode signifies a one-way transformation from one format to another. For instance, if you want to convert text files to HTML, you'd set `CONVERSION_MODE = "txt->html"`. This means the model will learn to convert text files specifically into HTML format, but not vice versa.
+
+   - Bidirectional Conversion: Denoted by `"&"`, this mode implies a two-way transformation between formats. For example, setting `CONVERSION_MODE = "wav&mp3"` instructs the model to learn bidirectional conversion between WAV and MP3 audio formats. In this mode, the model learns to convert files from WAV to MP3 and vice versa, allowing flexibility in both directions of conversion.
+
+2. **Prepare Your Data**: Ensure your data pairs are stored within the same directory path in both `TRAIN_FOLDERS` and `EVAL_FOLDERS`. Each pair should share identical paths, including filenames, differing only in their file extensions. For instance, if converting between WAV and MP3 formats, ensure files like "path/audio.wav" and "path/audio.mp3" are paired accordingly. This strict alignment guarantees the script correctly associates files for conversion based on the specified mode.
+
+3. **Adjust Training Parameters**: Although the conversion mode operates under the same training principles as generative modelling, you might want to adjust certain parameters in `config.py` to optimize the conversion process. This could include tuning the `PATCH_SIZE` and `PATCH_LENGTH` settings to better accommodate the file sizes commonly encountered in your conversion tasks.
+
+4. **Leverage Pre-trained Weights (Optional)**: Same as regular generative modelling, if you wish to fine-tune a pre-trained bGPT model, set `PRETRAINED_PATH` to the location of the pre-trained weights and ensure `LOAD_FROM_PRETRAINED=True`. To train a model from scratch, simply set `LOAD_FROM_PRETRAINED=False`.
+
+5. **Start Training for Conversion**: When training bGPT in conversion mode, the model learns to map byte sequences from the source format to the target format (or vice versa in bidirectional mode). Execute `train-gen.py` to start the training process, ensuring that the `CONVERSION_MODE` is correctly set in your configuration file.
+
+By leveraging the conversion mode, bGPT enables simulating and reverse engineering the behaviors of algorithms or hardware through paired inputs and outputs, opening up new possibilities for data processing and content generation tasks.
+
 ### Classification
 
 Classification with bGPT leverages the model's ability to understand and differentiate between various types of data at a fundamental level. This involves extracting a global feature from the byte sequence, which is then processed by a classification head. Here's how to approach classification tasks with bGPT:
