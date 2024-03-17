@@ -21,7 +21,7 @@ EVAL_FOLDERS = [
                 ]                                               # Folder containing evaluation data
 
 # Configuration for the paths
-PRE_WEIGHTS_PATH = "weights-text.pth"                           # Path to pre-trained weights
+PRETRAINED_PATH = "weights-text.pth"                            # Path to pre-trained weights
 WEIGHTS_PATH = "weights-test-ag-cls.pth"                        # Path to save weights
 LOGS_PATH = "logs-test-ag-cls.txt"                              # Path to save logs
 

@@ -266,9 +266,9 @@ if __name__ == "__main__":
     model = model.to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE)
 
-    if LOAD_FROM_PRETRAINED and os.path.exists(PRE_WEIGHTS_PATH):
+    if LOAD_FROM_PRETRAINED and os.path.exists(PRETRAINED_PATH):
         # Load checkpoint to CPU
-        checkpoint = torch.load(PRE_WEIGHTS_PATH, map_location='cpu')
+        checkpoint = torch.load(PRETRAINED_PATH, map_location='cpu')
 
         # Here, model is assumed to be on GPU
         # Load state dict to CPU model first, then move the model to GPU
