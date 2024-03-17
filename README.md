@@ -101,15 +101,15 @@ Inference with bGPT allows you to apply trained models to new data, performing t
 
 1. **Set Up the Inference Configuration**: First, ensure your `config.py` includes the configuration for inference as shown above. Adjust the parameters according to the task you want to perform:
 
-   - `INFERENCE_WEIGHTS_PATH`: This should point to the location of your trained model weights that you intend to use for inference. For example, `"weights-conversion"` indicates the model trained for converting files from one format to another.
+   - `INFERENCE_WEIGHTS_PATH`: This should point to the location of your trained model weights that you intend to use for inference. For example, `weights-conversion` indicates the model trained for converting files from one format to another.
    - `INPUT_EXT` and `TARGET_EXT`: These parameters define the extensions of the input and target files, respectively. In the given configuration, the model expects input files with the `.mid` extension and will aim to convert them into files with the `.abc` extension.
-   - `MODE`: Determines the mode of inference. `"convert"` mode is used for converting files from one format to another, while `"generate"` mode is used for generating new content.
+   - `MODE`: Determines the mode of inference. `convert` mode is used for converting files from one format to another, while `generate` mode is used for generating new content.
    - `NUM_SAMPLES`, `TOP_K`, `TOP_P`, and `TEMPERATURE`: These parameters control the sampling strategy for generation tasks, influencing the diversity and creativity of the output.
 
 2. **Performing Conversion or Generation**: Depending on the `MODE` you've set, the inference process will either convert input files to a new format or generate new content:
    
-   - **Conversion**: In `"convert"` mode, ensure your input files (e.g., `.mid`) are placed in a designated directory. The model will read these files, apply the conversion process, and output files in the target format (e.g., `.abc`) in the specified output directory.
-   - **Generation**: In `"generate"` mode, the model will generate samples from scratch. The number of samples to generate is specified by `NUM_SAMPLES`. The generated samples will be placed in the output directory.
+   - **Conversion**: In `convert` mode, ensure your input files (e.g., `.mid`) are placed in a designated directory. The model will read these files, apply the conversion process, and output files in the target format (e.g., `.abc`) in the specified output directory.
+   - **Generation**: In `generate` mode, the model will generate samples from scratch. The number of samples to generate is specified by `NUM_SAMPLES`. The generated samples will be placed in the output directory.
 
 4. **Executing Inference**: To start the inference process, run the script `inference.py`. Make sure the script is configured to use the settings from `config.py` for conducting the desired inference task.
 
