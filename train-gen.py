@@ -288,7 +288,7 @@ if __name__ == "__main__":
     else:
         pre_epoch = 0
         best_epoch = 0
-        min_eval_loss = 100
+        min_eval_loss = float('inf')
 
     if LOAD_FROM_CHECKPOINT and os.path.exists(WEIGHTS_PATH):
         # Load checkpoint to CPU
@@ -317,7 +317,7 @@ if __name__ == "__main__":
     else:
         pre_epoch = 0
         best_epoch = 0
-        min_eval_loss = 100
+        min_eval_loss = float('inf')
 
     for epoch in range(1+pre_epoch, NUM_EPOCHS+1):
         train_sampler.set_epoch(epoch)
