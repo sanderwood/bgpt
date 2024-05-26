@@ -41,7 +41,7 @@ ACCUMULATION_STEPS = 1                                          # Accumulation s
 PATCH_SAMPLING_BATCH_SIZE = 0                                   # Batch size for patch during training, 0 for full batch
 LOAD_FROM_CHECKPOINT = True                                    # Whether to load weights from a checkpoint
 LOAD_FROM_PRETRAINED = False                                     # Whether to load pre-trained weights from a checkpoint
-CONVERSION_MODE = 'ar'                                          # Mode of conversion ('ar' for autoregressive training, 'input->output' for unidirectional conversion, 'input&output' for bidirectional conversion)
+CONVERSION_MODE = None                                          # Mode of conversion None for autoregressive training, 'input->output' for unidirectional conversion, 'input&output' for bidirectional conversion)
 WANDB_LOG = True                                                # Whether to log to wandb
 SHOW_WARNS = False                                              # Whether to show warnings
 

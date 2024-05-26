@@ -121,7 +121,7 @@ def read_bytes(filename):
 
 class ByteDataset(Dataset):
     def __init__(self, filenames, split='train'):
-        if CONVERSION_MODE == 'ar':
+        if CONVERSION_MODE == None:
             print(f"Autoregressive Training Mode: loading {len(filenames)} files for {split}")
             self.filenames = filenames
         elif "->" in CONVERSION_MODE:
@@ -151,14 +151,14 @@ class ByteDataset(Dataset):
                     if os.path.exists(input_filename):
                         self.filenames.append((input_filename, filename))
         else:
-            raise ValueError("Invalid Conversion Mode, please check the config.py file. You can use 'ar', 'input->output', or 'input&output'.")
+            raise ValueError("Invalid Conversion Mode, please check the config.py file. You can use None, 'input->output', or 'input&output'.")
             
     def __len__(self):
         return len(self.filenames)
 
     def __getitem__(self, idx):
         
-        if CONVERSION_MODE == 'ar':
+        if CONVERSION_MODE == None:
             filename = self.filenames[idx]
             file_bytes, file_masks = read_bytes(filename)
         else:
