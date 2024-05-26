@@ -57,14 +57,14 @@ def read_bytes(filename):
 bos_patch = [byte for byte in bytearray(TARGET_EXT, 'utf-8')]
 bos_patch = bos_patch + [256] * (PATCH_SIZE - len(bos_patch))
 
-if MODE == "convert":
+if INFERENCE_MODE == "convert":
     files = os.listdir(INPUT_FOLDER)
     files = [i for i in files if i.split('.')[-1] == INPUT_EXT]
 else:
     files = list(range(NUM_SAMPLES))
 
 for i in files:
-    if MODE == "convert":
+    if INFERENCE_MODE == "convert":
         filename = OUTPUT_FOLDER+"/"+i+'.'+TARGET_EXT
         byte_list = read_bytes(INPUT_FOLDER+"/"+i)[:-PATCH_SIZE]+bos_patch
     else:
@@ -91,7 +91,7 @@ for i in files:
     with open(filename, 'wb') as file:
         for byte in byte_list:
             file.write(bytes([byte]))
-        if MODE == "convert":
+        if INFERENCE_MODE == "convert":
             print("Converted to "+filename)
         else:
             print("Generated "+filename)

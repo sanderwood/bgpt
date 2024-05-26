@@ -78,8 +78,8 @@ def read_bytes(filename):
     return bytes
 
 class ByteDataset(Dataset):
-    def __init__(self, filenames):
-        print(f"Loading {len(filenames)} files for classification")
+    def __init__(self, filenames, split='train'):
+        print(f"Classification Mode: loading {len(filenames)} files for {split}")
         self.filenames = []
         self.labels = {}
 
@@ -112,8 +112,8 @@ class ByteDataset(Dataset):
 train_files = list_files_in_directory(TRAIN_FOLDERS)
 eval_files = list_files_in_directory(EVAL_FOLDERS)
 
-train_set = ByteDataset(train_files)
-eval_set = ByteDataset(eval_files)
+train_set = ByteDataset(train_files, split='train')
+eval_set = ByteDataset(eval_files, split='eval')
 
 patch_config = GPT2Config(num_hidden_layers=PATCH_NUM_LAYERS, 
                     max_length=PATCH_LENGTH, 
@@ -152,6 +152,7 @@ def train_epoch():
     total_acc_num = 0
     iter_idx = 1
     model.train()
+    train_steps = (epoch-1)*len(train_set)
 
     for batch in tqdm_train_set:
         if is_autocast:
@@ -170,6 +171,12 @@ def train_epoch():
         total_train_loss += loss.item()
         total_acc_num += acc_num.item()
         tqdm_train_set.set_postfix({str(global_rank)+'_train_acc': total_acc_num / (iter_idx*batch_size)})
+        train_steps += 1
+        
+        # Log the training loss to wandb
+        if global_rank==0 and WANDB_LOG:
+            wandb.log({"train_loss": total_train_loss / iter_idx}, step=train_steps)
+
         iter_idx += 1
         
     return total_acc_num / ((iter_idx-1)*batch_size)
@@ -195,6 +202,16 @@ def eval_epoch():
 # train and eval
 if __name__ == "__main__":
 
+    if global_rank==0 and WANDB_LOG:
+        # Initialize wandb
+        wandb.init(project="bgpt", name="irish_cls_p_size_"+str(PATCH_SIZE)+
+                    "_p_length_"+str(PATCH_LENGTH)+
+                    "_b_layers_"+str(BYTE_NUM_LAYERS)+
+                    "_p_layers_"+str(PATCH_NUM_LAYERS)+
+                    "_h_size_"+str(HIDDEN_SIZE)+
+                    "_lr_"+str(LEARNING_RATE)+
+                    "_batch_"+str(BATCH_SIZE))
+                   
     labels = train_set.labels
 
     train_sampler = DistributedSampler(train_set, num_replicas=world_size, rank=global_rank)

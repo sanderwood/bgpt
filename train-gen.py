@@ -1,7 +1,9 @@
 import os
 import time
+import wandb
 import torch
 import random
+import warnings
 import numpy as np
 from utils import *
 from config import *
@@ -109,7 +111,8 @@ def read_bytes(filename):
     bytes = bos_patch + bytes + [256] * PATCH_SIZE
 
     if len(bytes) > PATCH_LENGTH*PATCH_SIZE:
-        print(f"Warning: {filename} is too long, truncating to {PATCH_LENGTH*PATCH_SIZE} bytes.")
+        if SHOW_WARNS:
+            warnings.warn(f"Warning: {filename} is too long, truncating to {PATCH_LENGTH*PATCH_SIZE} bytes.")
         bytes = bytes[:PATCH_LENGTH*PATCH_SIZE]
 
     masks = [1] * (len(bytes)//PATCH_SIZE)
@@ -117,12 +120,12 @@ def read_bytes(filename):
     return bytes, masks
 
 class ByteDataset(Dataset):
-    def __init__(self, filenames):
-        if CONVERSION_MODE == None:
-            print(f"Regular Training Mode: {CONVERSION_MODE}, loading {len(filenames)} files")
+    def __init__(self, filenames, split='train'):
+        if CONVERSION_MODE == 'ar':
+            print(f"Autoregressive Training Mode: loading {len(filenames)} files for {split}")
             self.filenames = filenames
         elif "->" in CONVERSION_MODE:
-            print(f"Unidirectional Conversion Mode: {CONVERSION_MODE}, loading {len(filenames)} files")
+            print(f"Unidirectional Conversion Mode: loading {len(filenames)} files for {split}")
             input_ext = CONVERSION_MODE.split("->")[0]
             target_ext = CONVERSION_MODE.split("->")[1]
 
@@ -133,7 +136,7 @@ class ByteDataset(Dataset):
                     if os.path.exists(target_filename):
                         self.filenames.append((filename, target_filename))
         elif "&" in CONVERSION_MODE:
-            print(f"Bidirectional Conversion Mode: {CONVERSION_MODE}, loading {len(filenames)} files")
+            print(f"Bidirectional Conversion Mode: loading {len(filenames)} files for {split}")
             input_ext = CONVERSION_MODE.split("&")[0]
             target_ext = CONVERSION_MODE.split("&")[1]
 
@@ -148,14 +151,14 @@ class ByteDataset(Dataset):
                     if os.path.exists(input_filename):
                         self.filenames.append((input_filename, filename))
         else:
-            raise ValueError("Invalid Conversion Mode, please check the config.py file")
+            raise ValueError("Invalid Conversion Mode, please check the config.py file. You can use 'ar', 'input->output', or 'input&output'.")
             
     def __len__(self):
         return len(self.filenames)
 
     def __getitem__(self, idx):
         
-        if CONVERSION_MODE == None:
+        if CONVERSION_MODE == 'ar':
             filename = self.filenames[idx]
             file_bytes, file_masks = read_bytes(filename)
         else:
@@ -196,6 +199,7 @@ def train_epoch():
     total_train_loss = 0
     iter_idx = 1
     model.train()
+    train_steps = (epoch-1)*len(train_set)
 
     for batch in tqdm_train_set:
         minibatches = split_into_minibatches(batch[0], batch[1], BATCH_SIZE//ACCUMULATION_STEPS)
@@ -210,6 +214,12 @@ def train_epoch():
         lr_scheduler.step()
         model.zero_grad(set_to_none=True)
         tqdm_train_set.set_postfix({str(global_rank)+'_train_loss': total_train_loss / iter_idx})
+        train_steps += 1
+        
+        # Log the training loss to wandb
+        if global_rank==0 and WANDB_LOG:
+            wandb.log({"train_loss": total_train_loss / iter_idx}, step=train_steps)
+
         iter_idx += 1
         
     return total_train_loss / (iter_idx-1)
@@ -235,10 +245,25 @@ def eval_epoch():
 # train and eval
 if __name__ == "__main__":
     
+    if global_rank==0 and WANDB_LOG:
+        # Initialize wandb
+        wandb.init(project="bgpt", name="irish_gen_p_size_"+str(PATCH_SIZE)+
+                    "_p_length_"+str(PATCH_LENGTH)+
+                    "_b_layers_"+str(BYTE_NUM_LAYERS)+
+                    "_p_layers_"+str(PATCH_NUM_LAYERS)+
+                    "_h_size_"+str(HIDDEN_SIZE)+
+                    "_lr_"+str(LEARNING_RATE)+
+                    "_batch_"+str(BATCH_SIZE))
+                   
     # load filenames under train and eval folder
     train_files = list_files_in_directory(TRAIN_FOLDERS)
     eval_files = list_files_in_directory(EVAL_FOLDERS)
 
+    if len(eval_files)==0:
+        random.shuffle(train_files)
+        eval_files = train_files[:int(len(train_files)*EVAL_SPLIT)]
+        train_files = train_files[int(len(train_files)*EVAL_SPLIT):]
+        
     train_batch_nums = int(len(train_files) / batch_size)
     eval_batch_nums = int(len(eval_files) / batch_size)
 
@@ -248,8 +273,8 @@ if __name__ == "__main__":
     train_files = train_files[:train_batch_nums*batch_size]
     eval_files = eval_files[:eval_batch_nums*batch_size]
 
-    train_set = ByteDataset(train_files)
-    eval_set = ByteDataset(eval_files)
+    train_set = ByteDataset(train_files, split='train')
+    eval_set = ByteDataset(eval_files, split='eval')
 
     train_sampler = DistributedSampler(train_set, num_replicas=world_size, rank=local_rank)
     eval_sampler = DistributedSampler(eval_set, num_replicas=world_size, rank=local_rank)
