@@ -66,11 +66,13 @@ The `config.py` file contains critical settings for training and inference, allo
 - **NUM_EPOCHS, LEARNING_RATE, BATCH_SIZE**: Control training duration, learning rate, and batch size for optimal learning.
 - **ACCUMULATION_STEPS**: Set accumulation steps to emulate larger batch sizes, managing memory usage efficiently.
 - **PATCH_SAMPLING_BATCH_SIZE**: Adjust batch size for patch sampling during training to reduce computational load, with `0` for full batch processing.
+- **WANDB_LOG**: Whether to log to Weights and Biases (wandb) for experiment tracking and visualization. Set to True to enable logging.
+- **SHOW_WARNS**: Whether to show warnings during training. Set to False to suppress warnings and keep the output clean.
 
 #### Inference Configuration
 
 - **INFERENCE_WEIGHTS_PATH**: Path to weights for inference.
-- **MODE**: Determines operation mode (`convert` or `generate`), guiding the model for specific outcomes.
+- **INFERENCE_MODE**: Determines operation mode (`convert` or `generate`), guiding the model for specific outcomes.
 - **NUM_SAMPLES, TOP_K, TOP_P, TEMPERATURE**: Set sampling strategy during inference to control the diversity of outputs.
 
 ### Generative Modelling
@@ -89,7 +91,7 @@ Generative modelling with bGPT is a flexible and powerful approach to learning a
 
 The conversion mode in bGPT adds a specialized functionality for transforming data from one format to another, leveraging the model's understanding of byte sequences across different file types. This mode supports both unidirectional and bidirectional conversions, enabling a wide range of data transformation tasks. Here's how to utilize the conversion mode effectively:
 
-1. **Define Conversion Mode**: In your `config.py` file, you'll define the `CONVERSION_MODE` setting, which governs how files are transformed. This setting offers two options: unidirectional and bidirectional conversion, denoted by `"->"` and `"&"` respectively.
+1. **Define Conversion Mode**: In your `config.py` file, you'll define the `CONVERSION_MODE` setting, which governs how files are transformed. This setting offers two options: unidirectional and bidirectional conversion, denoted by `"->"` and `"&"` respectively. The default mode is set to None for tasks that do not require conversion.
 
    - Unidirectional Conversion: Denoted by `"->"`, this mode signifies a one-way transformation from one format to another. For instance, if you want to convert text files to HTML, you'd set `CONVERSION_MODE = "txt->html"`. This means the model will learn to convert text files specifically into HTML format, but not vice versa.
 
@@ -123,10 +125,10 @@ Inference with bGPT allows you to apply trained models to new data, performing t
 
    - `INFERENCE_WEIGHTS_PATH`: This should point to the location of your trained model weights that you intend to use for inference. For example, `weights-conversion` indicates the model trained for converting files from one format to another.
    - `INPUT_EXT` and `TARGET_EXT`: These parameters define the extensions of the input and target files, respectively. In the given configuration, the model expects input files with the `.mid` extension and will aim to convert them into files with the `.abc` extension.
-   - `MODE`: Determines the mode of inference. `convert` mode is used for converting files from one format to another, while `generate` mode is used for generating new content.
+   - `INFERNECE_MODE`: Determines the mode of inference. `convert` mode is used for converting files from one format to another, while `generate` mode is used for generating new content.
    - `NUM_SAMPLES`, `TOP_K`, `TOP_P`, and `TEMPERATURE`: These parameters control the sampling strategy for generation tasks, influencing the diversity and creativity of the output.
 
-2. **Performing Conversion or Generation**: Depending on the `MODE` you've set, the inference process will either convert input files to a new format or generate new content:
+2. **Performing Conversion or Generation**: Depending on the `INFERNECE_MODE` you've set, the inference process will either convert input files to a new format or generate new content:
    
    - **Conversion**: In `convert` mode, ensure your input files (e.g., `.mid`) are placed in a designated directory. The model will read these files, apply the conversion process, and output files in the target format (e.g., `.abc`) in the specified output directory.
    - **Generation**: In `generate` mode, the model will generate samples from scratch. The number of samples to generate is specified by `NUM_SAMPLES`. The generated samples will be placed in the output directory.
