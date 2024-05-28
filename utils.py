@@ -148,12 +148,14 @@ class bGPTLMHeadModel(PreTrainedModel):
         :return: the generated patches
         """
         if patches.shape[-1]%PATCH_SIZE!=0:
-            tokens = patches[:,:,-(patches.shape[-1]%PATCH_SIZE):].squeeze(0, 1)
+            tokens = patches[:,:,-(patches.shape[-1]%PATCH_SIZE):].squeeze(0).squeeze(0)
             tokens = torch.cat((torch.tensor([self.special_token_id], device=self.device), tokens), dim=-1)
             patches = patches[:,:,:-(patches.shape[-1]%PATCH_SIZE)]
+        else:
+            tokens = torch.tensor([self.special_token_id], device=self.device)
+            
         patches = patches.reshape(len(patches), -1, PATCH_SIZE)
         encoded_patches = self.patch_level_decoder(patches)["last_hidden_state"]
-        tokens = torch.tensor([self.special_token_id], device=self.device)
         generated_patch = []            
 
         while True:
