@@ -26,15 +26,16 @@ if world_size > 1:
     dist.init_process_group(backend='nccl') if world_size > 1 else None
 else:
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-    
-# Set random seed
-seed = 0 + global_rank
-random.seed(seed)
-np.random.seed(seed)
-torch.manual_seed(seed)
-torch.cuda.manual_seed_all(seed)
-torch.backends.cudnn.deterministic = True
-torch.backends.cudnn.benchmark = False
+
+if DETERMINISTIC:
+    # Set random seed
+    seed = 0 + global_rank
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
 batch_size = 1
     
@@ -115,12 +116,12 @@ eval_files = list_files_in_directory(EVAL_FOLDERS)
 train_set = ByteDataset(train_files, split='train')
 eval_set = ByteDataset(eval_files, split='eval')
 
-patch_config = GPT2Config(num_hidden_layers=PATCH_NUM_LAYERS, 
-                    max_length=PATCH_LENGTH, 
-                    max_position_embeddings=PATCH_LENGTH,
-                    hidden_size=HIDDEN_SIZE,
-                    n_head=HIDDEN_SIZE//64,
-                    vocab_size=1)
+patch_config = GPT2Config(vocab_size=1,
+                        n_positions=PATCH_LENGTH,
+                        n_embd=HIDDEN_SIZE,
+                        n_layer=PATCH_NUM_LAYERS,
+                        n_head=HIDDEN_SIZE//64,
+                        n_inner=HIDDEN_SIZE*4)
 model = bGPTForClassification(patch_config, len(train_set.labels))
 model = model.to(device)
 
@@ -233,12 +234,12 @@ if __name__ == "__main__":
         # Load checkpoint to CPU
         checkpoint = torch.load(PRETRAINED_PATH, map_location='cpu')
 
-        byte_config = GPT2Config(num_hidden_layers=BYTE_NUM_LAYERS, 
-                            max_length=PATCH_SIZE+1, 
-                            max_position_embeddings=PATCH_SIZE+1,
-                            hidden_size=HIDDEN_SIZE,
-                            n_head=HIDDEN_SIZE//64,
-                            vocab_size=256+1)
+        byte_config = GPT2Config(vocab_size=256+1,
+                                n_positions=PATCH_SIZE+1,
+                                n_embd=HIDDEN_SIZE,
+                                n_layer=BYTE_NUM_LAYERS,
+                                n_head=HIDDEN_SIZE//64,
+                                n_inner=HIDDEN_SIZE*4)
         pretrained_model = bGPTLMHeadModel(patch_config, byte_config)
         pretrained_model.load_state_dict(checkpoint['model'])
 

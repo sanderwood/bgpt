@@ -44,6 +44,7 @@ LOAD_FROM_PRETRAINED = False                                     # Whether to lo
 CONVERSION_MODE = None                                          # Mode of conversion None for autoregressive training, 'input->output' for unidirectional conversion, 'input&output' for bidirectional conversion)
 WANDB_LOG = True                                                # Whether to log to wandb
 SHOW_WARNS = False                                              # Whether to show warnings
+DETERMINISTIC = True                                           # Whether to set random seed for reproducibility
 
 # Configuration for inference
 INFERENCE_WEIGHTS_PATH = "weights-conversion.pth"               # Path to weights for inference

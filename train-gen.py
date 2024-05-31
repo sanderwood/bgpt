@@ -27,30 +27,31 @@ if world_size > 1:
     dist.init_process_group(backend='nccl') if world_size > 1 else None
 else:
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-    
-# Set random seed
-seed = 0 + global_rank
-random.seed(seed)
-np.random.seed(seed)
-torch.manual_seed(seed)
-torch.cuda.manual_seed_all(seed)
-torch.backends.cudnn.deterministic = True
-torch.backends.cudnn.benchmark = False
+
+if DETERMINISTIC:
+    # Set random seed
+    seed = 0 + global_rank
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
 batch_size = BATCH_SIZE
 
-patch_config = GPT2Config(num_hidden_layers=PATCH_NUM_LAYERS, 
-                    max_length=PATCH_LENGTH, 
-                    max_position_embeddings=PATCH_LENGTH,
-                    hidden_size=HIDDEN_SIZE,
-                    n_head=HIDDEN_SIZE//64,
-                    vocab_size=1)
-byte_config = GPT2Config(num_hidden_layers=BYTE_NUM_LAYERS, 
-                    max_length=PATCH_SIZE+1, 
-                    max_position_embeddings=PATCH_SIZE+1,
-                    hidden_size=HIDDEN_SIZE,
-                    n_head=HIDDEN_SIZE//64,
-                    vocab_size=256+1)
+patch_config = GPT2Config(vocab_size=1,
+                        n_positions=PATCH_LENGTH,
+                        n_embd=HIDDEN_SIZE,
+                        n_layer=PATCH_NUM_LAYERS,
+                        n_head=HIDDEN_SIZE//64,
+                        n_inner=HIDDEN_SIZE*4)
+byte_config = GPT2Config(vocab_size=256+1,
+                        n_positions=PATCH_SIZE+1,
+                        n_embd=HIDDEN_SIZE,
+                        n_layer=BYTE_NUM_LAYERS,
+                        n_head=HIDDEN_SIZE//64,
+                        n_inner=HIDDEN_SIZE*4)
 model = bGPTLMHeadModel(patch_config, byte_config)
 model = model.to(device)
 
@@ -113,7 +114,15 @@ def read_bytes(filename):
     if len(bytes) > PATCH_LENGTH*PATCH_SIZE:
         if SHOW_WARNS:
             warnings.warn(f"Warning: {filename} is too long, truncating to {PATCH_LENGTH*PATCH_SIZE} bytes.")
-        bytes = bytes[:PATCH_LENGTH*PATCH_SIZE]
+        choices = ["head", "body", "tail"]
+        choice = random.choice(choices)
+        if choice == "head":
+            bytes = bytes[:PATCH_LENGTH*PATCH_SIZE]
+        elif choice == "body" and len(bytes) > (PATCH_LENGTH+1)*PATCH_SIZE:
+            start = random.randint(1, len(bytes)//PATCH_SIZE-PATCH_LENGTH)
+            bytes = bytes[start*PATCH_SIZE:(start+PATCH_LENGTH)*PATCH_SIZE]
+        else:
+            bytes = bytes[-PATCH_LENGTH*PATCH_SIZE:]
 
     masks = [1] * (len(bytes)//PATCH_SIZE)
 
@@ -247,7 +256,7 @@ if __name__ == "__main__":
     
     if global_rank==0 and WANDB_LOG:
         # Initialize wandb
-        wandb.init(project="bgpt", name="irish_gen_p_size_"+str(PATCH_SIZE)+
+        wandb.init(project="bgpt", name="midi_gen_p_size_"+str(PATCH_SIZE)+
                     "_p_length_"+str(PATCH_LENGTH)+
                     "_b_layers_"+str(BYTE_NUM_LAYERS)+
                     "_p_layers_"+str(PATCH_NUM_LAYERS)+
