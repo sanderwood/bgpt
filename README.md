@@ -68,7 +68,8 @@ The `config.py` file contains critical settings for training and inference, allo
 - **PATCH_SAMPLING_BATCH_SIZE**: Adjust batch size for patch sampling during training to reduce computational load, with `0` for full batch processing.
 - **WANDB_LOG**: Whether to log to Weights and Biases (wandb) for experiment tracking and visualization. Set to True to enable logging.
 - **SHOW_WARNS**: Whether to show warnings during training. Set to False to suppress warnings and keep the output clean.
-
+- **DETERMINISTIC**: Set to True for deterministic training, ensuring reproducibility across runs.
+- 
 #### Inference Configuration
 
 - **INFERENCE_WEIGHTS_PATH**: Path to weights for inference.
