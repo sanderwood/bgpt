@@ -1,8 +1,10 @@
 import os
 import math
+import wandb
 import time
 import torch
 import random
+import warnings
 import numpy as np
 from copy import deepcopy
 from utils import *
@@ -76,6 +78,19 @@ def read_bytes(filename):
     bos_patch = ext + [256] * (PATCH_SIZE - len(ext))
     bytes = bos_patch + bytes + [256] * PATCH_SIZE
 
+    if len(bytes) > PATCH_LENGTH*PATCH_SIZE:
+        if SHOW_WARNS:
+            warnings.warn(f"Warning: {filename} is too long, truncating to {PATCH_LENGTH*PATCH_SIZE} bytes.")
+        choices = ["head", "body", "tail"]
+        choice = random.choice(choices)
+        if choice == "head":
+            bytes = bytes[:PATCH_LENGTH*PATCH_SIZE]
+        elif choice == "body" and len(bytes) > (PATCH_LENGTH+1)*PATCH_SIZE:
+            start = random.randint(1, len(bytes)//PATCH_SIZE-PATCH_LENGTH)
+            bytes = bytes[start*PATCH_SIZE:(start+PATCH_LENGTH)*PATCH_SIZE]
+        else:
+            bytes = bytes[-PATCH_LENGTH*PATCH_SIZE:]
+
     return bytes
 
 class ByteDataset(Dataset):
@@ -91,10 +106,9 @@ class ByteDataset(Dataset):
             label = os.path.basename(filename).split('_')[0]
             label = f"{label}.{ext}"
 
-            if file_size <= PATCH_LENGTH-2:
-                self.filenames.append((filename, label))
-                if label not in self.labels:
-                    self.labels[label] = len(self.labels)
+            self.filenames.append((filename, label))
+            if label not in self.labels:
+                self.labels[label] = len(self.labels)
             
     def __len__(self):
         return len(self.filenames)
@@ -113,6 +127,11 @@ class ByteDataset(Dataset):
 train_files = list_files_in_directory(TRAIN_FOLDERS)
 eval_files = list_files_in_directory(EVAL_FOLDERS)
 
+if len(eval_files)==0:
+    random.shuffle(train_files)
+    eval_files = train_files[:int(len(train_files)*EVAL_SPLIT)]
+    train_files = train_files[int(len(train_files)*EVAL_SPLIT):]
+    
 train_set = ByteDataset(train_files, split='train')
 eval_set = ByteDataset(eval_files, split='eval')
 
