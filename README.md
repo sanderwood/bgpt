@@ -61,7 +61,7 @@ The `config.py` file contains critical settings for training and inference, allo
 
 - **TRAIN_FOLDERS**: Specify the dataset folders for training. Multiple folders can be included.
 - **EVAL_FOLDERS**: Specify evaluation dataset folders.
-- **EVAL_SPLIT**: A numerical value that represents the proportion of files randomly selected from `TRAIN_FOLDERS` as the evaluation set if no files are found in `EVAL_FOLDERS`.
+- **EVAL_SPLIT**: A numerical value that represents the proportion of files randomly selected from `TRAIN_FOLDERS` as the evaluation set if no files are found in `EVAL_FOLDERS`. Set to `0.01` by default.
 - **PRETRAINED_PATH**: Path to pre-trained weights for transfer learning and fine-tuning.
 - **WEIGHTS_PATH & LOGS_PATH**: Define locations to save trained weights and logs, respectively.
 - **NUM_EPOCHS, LEARNING_RATE, BATCH_SIZE**: Control training duration, learning rate, and batch size for optimal learning.
